@@ -12,32 +12,28 @@ import qualified X0
 main :: IO ()
 main = do
   let p =
-        ( R0.Plus
-            (R0.Plus (R0.Int 2) (R0.Int 3))
-            (R0.Let "x" R0.Read (R0.Plus (R0.Var "x") (R0.Var "x")))
-        )
+        R0.Program
+          ()
+          ( R0.Plus
+              (R0.Plus (R0.Int 2) (R0.Int 3))
+              (R0.Let "x" R0.Read (R0.Plus (R0.Var "x") (R0.Var "x")))
+          )
   putStrLn ""
   putStrLn "***************** uniquify *****************"
-  R0.Program
-    ()
-    p
+  p
     & R0.uniquify
     & R0.pprint
     & putStrLn
   putStrLn ""
   putStrLn "***************** removeComplexOperations *****************"
-  R0.Program
-    ()
-    p
+  p
     & R0.uniquify
     & RCO.removeComplexOperations
     & RCO.pprint
     & putStrLn
   putStrLn ""
   putStrLn "***************** explicateControl *****************"
-  R0.Program
-    ()
-    p
+  p
     & R0.uniquify
     & RCO.removeComplexOperations
     & C0.explicateControl
@@ -45,9 +41,7 @@ main = do
     & putStrLn
   putStrLn ""
   putStrLn "***************** uncoverLocals *****************"
-  R0.Program
-    ()
-    p
+  p
     & R0.uniquify
     & RCO.removeComplexOperations
     & C0.explicateControl
@@ -56,9 +50,7 @@ main = do
     & putStrLn
   putStrLn ""
   putStrLn "***************** selectInstructions *****************"
-  R0.Program
-    ()
-    p
+  p
     & R0.uniquify
     & RCO.removeComplexOperations
     & C0.explicateControl
@@ -68,9 +60,7 @@ main = do
     & putStrLn
   putStrLn ""
   putStrLn "***************** assignHomes *****************"
-  R0.Program
-    ()
-    p
+  p
     & R0.uniquify
     & RCO.removeComplexOperations
     & C0.explicateControl
@@ -80,9 +70,7 @@ main = do
     & X0.pprint
     & putStrLn
   putStrLn "***************** patch *****************"
-  R0.Program
-    ()
-    p
+  p
     & R0.uniquify
     & RCO.removeComplexOperations
     & C0.explicateControl
@@ -94,9 +82,7 @@ main = do
     & putStrLn
   putStrLn "***************** printX86 *****************"
   let x86 =
-        R0.Program
-          ()
-          p
+        p
           & R0.uniquify
           & RCO.removeComplexOperations
           & C0.explicateControl
@@ -115,7 +101,13 @@ main = do
   putStrLn "***************** executing generate program *****************"
   (_, _, _, ph) <- createProcess (shell "./a.out")
   exitCode <- waitForProcess ph
-  print $ case exitCode of
-    ExitSuccess -> 1
-    ExitFailure i -> i
+  putStrLn
+    ( "Compiled program output: "
+        ++ show
+          ( case exitCode of
+              ExitSuccess -> 1
+              ExitFailure i -> i
+          )
+    )
+  putStrLn ("Interpreted program output: " ++ show (R0.interpret p))
   return ()

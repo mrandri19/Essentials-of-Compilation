@@ -29,7 +29,7 @@ type Env = Map.Map Var Int
 
 interpretE :: Env -> Exp -> Int
 interpretE _ (Int i) = i
-interpretE _ (Read) = 32
+interpretE _ (Read) = 42
 interpretE env (Minus e) = - (interpretE env e)
 interpretE env (Plus e1 e2) = (interpretE env e1) + (interpretE env e2)
 interpretE env (Var x) = env Map.! x
